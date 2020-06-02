@@ -23,6 +23,8 @@ parser.add_argument("--out", "-o", default='anim', help="Name of mpeg file")
 parser.add_argument("--fps", "-f", default=15, help="Frames per second")
 parser.add_argument("--dpi", "-d", default=100, type=int, help="Dots per inch")
 parser.add_argument("--k", "-k", default=None, type=int, help="Second dimension, if any")
+parser.add_argument("--jrange", "-j", nargs=2, default=None, type=int, help="j-range")
+parser.add_argument("--irange", "-i", nargs=2, default=None, type=int, help="i-range")
 parser.add_argument("--vlim", "-l",  action='store', type=two_floats, default="0 0", help="vmin vmax")
 parser.add_argument("--colormap", "-c",  default='wbgr', help="Colormap")
 parser.add_argument("--begin", "-b", default=0, type=int, help="Beginning record")
@@ -44,6 +46,14 @@ if args.k is None:
     k = ...
 else:
     k = args.k
+if args.jrange is None:
+    jslice = ...
+else:
+    jslice = slice(args.jrange[0], args.jrange[1])
+if args.irange is None:
+    islice = ...
+else:
+    islice = slice(args.irange[0], args.irange[1])
 
 if args.begin<0: # 0 means the beginning
     nbegin = var.shape[0]+args.begin
@@ -55,7 +65,7 @@ else:
     nend = args.end
 nrange_full = list( range(nbegin, nend, args.stride) )
 
-data = var[nend-args.stride,k]
+data = var[nend-args.stride,k][jslice][:,islice]
 nj,ni = data.shape
 
 vmin, vmax = args.vlim[0], args.vlim[1]
@@ -112,7 +122,7 @@ with open("animlist.txt", "w") as listfile:
             for n in nrange:
                 frame += 1
                 print('\r%s %i/%i (%.1f%%) '%(filename,frame,nframes,100.*frame/nframes), end='')
-                data = var[n,k]
+                data = var[n,k][jslice][:,islice]
                 im.set_data(data[-1::-1,:])
                 if args.label is not None:
                     label.set_text('%s r:%i f:%i/%i clim:%g,%g'%(
