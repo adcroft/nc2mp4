@@ -75,8 +75,9 @@ if vmax==vmin:
 
 metadata = dict(title=args.variable)
 writer = FFMpegWriter(fps=args.fps, metadata=metadata,
-    codec='libx264', extra_args=['-pix_fmt', 'yuv420p', '-profile:v', 'high', '-tune', 'animation', '-crf', '4',
-                            '-vf','pad=ceil(iw/2)*2:ceil(ih/2)*2'])
+    codec='libx264', extra_args=['-s', '%ix%i'%(ni,nj),
+                        '-pix_fmt', 'yuv420p', '-profile:v', 'high', '-tune', 'animation', '-crf', '4',
+                        '-vf','pad=ceil(iw/2)*2:ceil(ih/2)*2'])
    # -vf option added because the frame sometimes changes size !?
 
 if args.colormap=='wbgr':
