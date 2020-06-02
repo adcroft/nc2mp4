@@ -21,6 +21,7 @@ parser.add_argument("variable", help="Name of variable in netCDF files")
 parser.add_argument("files", nargs="*", help="netCDF files to be read")
 parser.add_argument("--out", "-o", default='anim', help="Name of mpeg file")
 parser.add_argument("--fps", "-f", default=15, help="Frames per second")
+parser.add_argument("--dpi", "-d", default=100, type=int, help="Dots per inch")
 parser.add_argument("--k", "-k", default=None, type=int, help="Second dimension, if any")
 parser.add_argument("--vlim", "-l",  action='store', type=two_floats, default="0 0", help="vmin vmax")
 parser.add_argument("--colormap", "-c",  default='wbgr', help="Colormap")
@@ -42,7 +43,6 @@ if args.k is None:
     k = ...
 else:
     k = args.k
-dpi=100
 
 if args.begin<0: # 0 means the beginning
     nbegin = var.shape[0]+args.begin
@@ -77,7 +77,7 @@ if args.colormap=='wbgr':
 if args.visualize:
     matplotlib.use('TKAgg')
 
-fig = plt.figure( figsize=(ni/dpi,nj/dpi), dpi=dpi )
+fig = plt.figure( figsize=(ni/args.dpi,nj/args.dpi), dpi=args.dpi )
 ax = fig.add_axes([0,0,1,1])
 im = ax.imshow(data, cmap=args.colormap)
 
