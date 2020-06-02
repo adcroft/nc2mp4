@@ -32,6 +32,7 @@ parser.add_argument("--progress", "-p", action='store_true', help="Display progr
 parser.add_argument("--fpf", default=60, type=int, help="Frames per file")
 parser.add_argument("--visualize","-v", action='store_true', help="Show the sample frame")
 parser.add_argument("--keep", action='store_true', help="Keep intermediate files")
+parser.add_argument("--label", nargs=2, type=float, default=None, help="Position of text")
 
 args = parser.parse_args()
 print('Arguments:', args)
@@ -81,6 +82,9 @@ fig = plt.figure( figsize=(ni/args.dpi,nj/args.dpi), dpi=args.dpi )
 ax = fig.add_axes([0,0,1,1])
 im = ax.imshow(data, cmap=args.colormap)
 
+if args.label is not None:
+    label = ax.text(args.label[0]*ni, args.label[1]*nj, '')
+
 if args.visualize:
     plt.show()
     exit()
@@ -110,6 +114,9 @@ with open("animlist.txt", "w") as listfile:
                 print('\r%s %i/%i (%.1f%%) '%(filename,frame,nframes,100.*frame/nframes), end='')
                 data = var[n,k]
                 im.set_data(data[-1::-1,:])
+                if args.label is not None:
+                    label.set_text('%s r:%i f:%i/%i clim:%g,%g'%(
+                                   args.variable, n, frame, nframes, vmin, vmax))
                 writer.grab_frame()
                 if args.progress:
                     t = time.perf_counter() - timer_write
