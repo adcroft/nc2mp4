@@ -91,7 +91,7 @@ if args.visualize:
 
 fig = plt.figure( figsize=(ni/args.dpi,nj/args.dpi), dpi=args.dpi )
 ax = fig.add_axes([0,0,1,1])
-im = ax.imshow(data, cmap=args.colormap)
+im = ax.imshow(data, cmap=args.colormap, vmin=vmin, vmax=vmax)
 
 if args.label is not None:
     label = ax.text(args.label[0]*ni, args.label[1]*nj, '')
