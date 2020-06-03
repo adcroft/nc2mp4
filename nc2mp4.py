@@ -25,14 +25,14 @@ parser.add_argument("--dpi", "-d", default=100, type=int, help="Dots per inch")
 parser.add_argument("--k", "-k", default=None, type=int, help="Second dimension, if any")
 parser.add_argument("--jrange", "-j", nargs=2, default=None, type=int, help="j-range")
 parser.add_argument("--irange", "-i", nargs=2, default=None, type=int, help="i-range")
-parser.add_argument("--vlim", "-l",  action='store', type=two_floats, default="0 0", help="vmin vmax")
+parser.add_argument("--vlim", "-v",  action='store', type=two_floats, default="0 0", help="vmin vmax")
 parser.add_argument("--colormap", "-c",  default='wbgr', help="Colormap")
 parser.add_argument("--begin", "-b", default=0, type=int, help="Beginning record")
 parser.add_argument("--end", "-e", default=0, type=int, help="Ending record")
 parser.add_argument("--stride", "-s", default=1, type=int, help="Record stride")
 parser.add_argument("--progress", "-p", action='store_true', help="Display progress stats")
 parser.add_argument("--fpf", default=60, type=int, help="Frames per file")
-parser.add_argument("--visualize","-v", action='store_true', help="Show the sample frame")
+parser.add_argument("--testview","-t", action='store_true', help="Test view by showing the last frame")
 parser.add_argument("--keep", action='store_true', help="Keep intermediate files")
 parser.add_argument("--label", nargs=2, type=float, default=None, help="Position of text")
 
@@ -86,7 +86,7 @@ if args.colormap=='wbgr':
              'blue':  [[0.0,  0.2, 0.2], [0.2,  0.8, 0.8], [0.4,  0.0, 0.0], [0.6,  0.9, 0.9], [0.8,  0.3, 0.3], [1.0,  0.9, 0.9]]}
     args.colormap = matplotlib.colors.LinearSegmentedColormap('test', segmentdata=cdict, N=256)
 
-if args.visualize:
+if args.testview:
     matplotlib.use('TKAgg')
 
 fig = plt.figure( figsize=(2*ni/args.dpi,2*nj/args.dpi), dpi=args.dpi )
@@ -96,7 +96,7 @@ im = ax.imshow(data, interpolation='none', cmap=args.colormap, vmin=vmin, vmax=v
 if args.label is not None:
     label = ax.text(args.label[0]*ni, args.label[1]*nj, 'LABEL')
 
-if args.visualize:
+if args.testview:
     plt.show()
     exit()
 
