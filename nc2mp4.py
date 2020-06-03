@@ -37,6 +37,7 @@ parser.add_argument("--testview","-t", action='store_true', help="Test view by s
 parser.add_argument("--keep", action='store_true', help="Keep intermediate files")
 parser.add_argument("--label", nargs=2, type=float, default=None, help="Position of text")
 parser.add_argument("--multiply", '-x', type=float, default=1., help="Multiplier")
+parser.add_argument("--quiet", '-q', action='store_true', help="Less output")
 parser.add_argument("--debug", '-D', action='store_true', help="Debugging info")
 
 args = parser.parse_args()
@@ -70,6 +71,14 @@ nrange_full = list( range(nbegin, nend, args.stride) )
 
 data = args.multiply * var[nend-args.stride,k][jslice][:,islice].filled(0.)
 nj,ni = data.shape
+
+if not args.quiet:
+    print('Variable shape in file: ',var.shape)
+    print('Data shape for plotting: ',nj,ni)
+    print('matplotlib working image is %.2f" x %.2f"'%(ni/args.dpi*args.ppdp,nj/args.dpi*args.ppdp))
+    print('Movie frame dimensions will be %i x %i'%(ni*args.ppdp,nj*args.ppdp))
+    print('The movie will have %i frames'%(len(nrange_full)))
+    print('The movie last %.2f seconds'%(len(nrange_full)/args.fps))
 
 vmin, vmax = args.vlim[0], args.vlim[1]
 if vmax==vmin:
@@ -125,7 +134,8 @@ with open("animlist.txt", "w") as listfile:
         with writer.saving(fig, filename, args.dpi):
             for n in nrange:
                 frame += 1
-                print('\r%s %i/%i (%.1f%%) '%(filename,frame,nframes,100.*frame/nframes), end='')
+                if args.progress:
+                    print('\r%s %i/%i (%.1f%%) '%(filename,frame,nframes,100.*frame/nframes), end='')
                 data = args.multiply * var[n,k][jslice][:,islice].filled(0.)
                 im.set_data(data[-1::-1,:])
                 if args.label is not None:
@@ -137,7 +147,7 @@ with open("animlist.txt", "w") as listfile:
                     t = time.perf_counter() - timer_write
                     dt = t/frame
                     ttot, trem = nframes*dt, (nframes-frame)*dt
-                    print('%.3fs elapsed, %.3fs/frame, %.1fs total, %.1fs remaining'%(t,dt,ttot,trem),
+                    print('%.3fs elapsed, %.3fs/frame, %.1fs total, %.1fs remaining  '%(t,dt,ttot,trem),
                           end='')
         if args.progress:
             t = time.perf_counter() - timer_write
@@ -146,8 +156,10 @@ with open("animlist.txt", "w") as listfile:
             print('\r%s created, %i/%i (%.1f%%) %.1fs elapsed, %.3fs/frame, %.1fs total, %.1fs remaining'%(
                   filename,frame,nframes,100.*frame/nframes,t,dt,ttot,trem))
 
-print(['ffmpeg','-f','concat','-safe','0','-i','animlist.txt','-y','-c','copy','%s.mp4'%(args.out)])
-subprocess.run(['ffmpeg','-f','concat','-safe','0','-i','animlist.txt','-y','-c','copy','%s.mp4'%(args.out)])
+ffmpeg_args = ['ffmpeg','-loglevel','warning','-f','concat','-safe','0','-i','animlist.txt','-y','-c','copy','%s.mp4'%(args.out)]
+if not args.quiet:
+    print('running: ',' '.join(ffmpeg_args))
+subprocess.run(ffmpeg_args)
 if not args.keep:
     for f in tmpfiles:
         os.remove(f)
