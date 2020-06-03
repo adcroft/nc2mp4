@@ -21,7 +21,8 @@ parser.add_argument("variable", help="Name of variable in netCDF files")
 parser.add_argument("files", nargs="*", help="netCDF files to be read")
 parser.add_argument("--out", "-o", default='anim', help="Name of mpeg file")
 parser.add_argument("--fps", "-f", default=15, help="Frames per second")
-parser.add_argument("--dpi", "-d", default=100, type=int, help="Dots per inch")
+parser.add_argument("--dpi", "-d", default=100, type=int, help="Dots per inch (sets font size wrt image)")
+parser.add_argument("--ppdp", "-P", default=1., type=float, help="Pixels per data point (sets frame size)")
 parser.add_argument("--k", "-k", default=None, type=int, help="Second dimension, if any")
 parser.add_argument("--jrange", "-j", nargs=2, default=None, type=int, help="j-range")
 parser.add_argument("--irange", "-i", nargs=2, default=None, type=int, help="i-range")
@@ -76,7 +77,7 @@ if vmax==vmin:
 
 metadata = dict(title=args.variable)
 writer = FFMpegWriter(fps=args.fps, metadata=metadata,
-    codec='libx264', extra_args=['-s', '%ix%i'%(ni + (ni%2),nj + (nj%2)),
+    codec='libx264', extra_args=[#'-s', '%ix%i'%(ni + (ni%2),nj + (nj%2)),
                         '-pix_fmt', 'yuv420p', '-profile:v', 'high', '-tune', 'animation', '-crf', '4',
                         '-vf','pad=ceil(iw/2)*2:ceil(ih/2)*2'])
    # -vf option added because the frame sometimes changes size !?
@@ -90,7 +91,7 @@ if args.colormap=='wbgr':
 if args.testview:
     matplotlib.use('TKAgg')
 
-fig = plt.figure( figsize=(2*ni/args.dpi,2*nj/args.dpi), dpi=args.dpi )
+fig = plt.figure( figsize=(ni/args.dpi*args.ppdp,nj/args.dpi*args.ppdp), dpi=args.dpi )
 ax = fig.add_axes([0,0,1,1])
 im = ax.imshow(data, interpolation='none', cmap=args.colormap, vmin=vmin, vmax=vmax)
 
@@ -120,7 +121,7 @@ with open("animlist.txt", "w") as listfile:
         nrange = nrange_full[:j]
         nrange_full = nrange_full[j:]
         these_frames = len(nrange)
-        with writer.saving(fig, filename, these_frames):
+        with writer.saving(fig, filename, args.dpi):
             for n in nrange:
                 frame += 1
                 print('\r%s %i/%i (%.1f%%) '%(filename,frame,nframes,100.*frame/nframes), end='')
