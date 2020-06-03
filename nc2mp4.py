@@ -89,9 +89,9 @@ if args.colormap=='wbgr':
 if args.visualize:
     matplotlib.use('TKAgg')
 
-fig = plt.figure( figsize=(ni/args.dpi,nj/args.dpi), dpi=args.dpi )
+fig = plt.figure( figsize=(2*ni/args.dpi,2*nj/args.dpi), dpi=args.dpi )
 ax = fig.add_axes([0,0,1,1])
-im = ax.imshow(data, cmap=args.colormap, vmin=vmin, vmax=vmax)
+im = ax.imshow(data, interpolation='none', cmap=args.colormap, vmin=vmin, vmax=vmax)
 
 if args.label is not None:
     label = ax.text(args.label[0]*ni, args.label[1]*nj, '')
