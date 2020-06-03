@@ -37,9 +37,10 @@ parser.add_argument("--testview","-t", action='store_true', help="Test view by s
 parser.add_argument("--keep", action='store_true', help="Keep intermediate files")
 parser.add_argument("--label", nargs=2, type=float, default=None, help="Position of text")
 parser.add_argument("--multiply", '-x', type=float, default=1., help="Multiplier")
+parser.add_argument("--debug", '-D', action='store_true', help="Debugging info")
 
 args = parser.parse_args()
-print('Arguments:', args)
+if args.debug: print('Arguments:', args)
 
 timer_init = time.perf_counter()
 nc = netCDF4.MFDataset(args.files)
@@ -131,6 +132,7 @@ with open("animlist.txt", "w") as listfile:
                     label.set_text('%s r:%i f:%i/%i clim:%g,%g'%(
                                    args.variable, n, frame, nframes, vmin, vmax))
                 writer.grab_frame()
+                if args.debug: print(writer.frame_size, end='')
                 if args.progress:
                     t = time.perf_counter() - timer_write
                     dt = t/frame
