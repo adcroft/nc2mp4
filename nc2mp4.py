@@ -94,7 +94,7 @@ ax = fig.add_axes([0,0,1,1])
 im = ax.imshow(data, interpolation='none', cmap=args.colormap, vmin=vmin, vmax=vmax)
 
 if args.label is not None:
-    label = ax.text(args.label[0]*ni, args.label[1]*nj, '')
+    label = ax.text(args.label[0]*ni, args.label[1]*nj, 'LABEL')
 
 if args.visualize:
     plt.show()
