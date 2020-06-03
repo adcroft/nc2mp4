@@ -35,6 +35,7 @@ parser.add_argument("--fpf", default=60, type=int, help="Frames per file")
 parser.add_argument("--testview","-t", action='store_true', help="Test view by showing the last frame")
 parser.add_argument("--keep", action='store_true', help="Keep intermediate files")
 parser.add_argument("--label", nargs=2, type=float, default=None, help="Position of text")
+parser.add_argument("--multiply", '-x', type=float, default=1., help="Multiplier")
 
 args = parser.parse_args()
 print('Arguments:', args)
@@ -65,7 +66,7 @@ else:
     nend = args.end
 nrange_full = list( range(nbegin, nend, args.stride) )
 
-data = var[nend-args.stride,k][jslice][:,islice]
+data = args.multiply * var[nend-args.stride,k][jslice][:,islice].filled(0.)
 nj,ni = data.shape
 
 vmin, vmax = args.vlim[0], args.vlim[1]
@@ -123,7 +124,7 @@ with open("animlist.txt", "w") as listfile:
             for n in nrange:
                 frame += 1
                 print('\r%s %i/%i (%.1f%%) '%(filename,frame,nframes,100.*frame/nframes), end='')
-                data = var[n,k][jslice][:,islice]
+                data = args.multiply * var[n,k][jslice][:,islice].filled(0.)
                 im.set_data(data[-1::-1,:])
                 if args.label is not None:
                     label.set_text('%s r:%i f:%i/%i clim:%g,%g'%(
