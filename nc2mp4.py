@@ -78,7 +78,7 @@ if not args.quiet:
     print('matplotlib working image is %.2f" x %.2f"'%(ni/args.dpi*args.ppdp,nj/args.dpi*args.ppdp))
     print('Movie frame dimensions will be %i x %i'%(ni*args.ppdp,nj*args.ppdp))
     print('The movie will have %i frames'%(len(nrange_full)))
-    print('The movie last %.2f seconds'%(len(nrange_full)/args.fps))
+    print('The movie will last %.2f seconds'%(len(nrange_full)/float(args.fps)))
 
 vmin, vmax = args.vlim[0], args.vlim[1]
 if vmax==vmin:
